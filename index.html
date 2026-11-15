@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>가로 일정 타임라인</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Malgun Gothic", sans-serif;
+      background-color: #f8fafc;
+      padding: 40px 20px;
+      color: #1e293b;
+    }
+
+    h1 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+      padding-left: 10px;
+    }
+
+    /* 가로로 쭉 이어지는 컨테이너 */
+    .schedule-wrapper {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      padding: 10px 10px 24px 10px;
+      scroll-behavior: smooth;
+    }
+
+    /* 스크롤바 디자인 (선택사항) */
+    .schedule-wrapper::-webkit-scrollbar {
+      height: 8px;
+    }
+    .schedule-wrapper::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 4px;
+    }
+
+    /* 개별 일정 카드 */
+    .schedule-card {
+      flex: 0 0 260px; /* 카드 가로 너비 고정 */
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+      border: 1px solid #e2e8f0;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .schedule-tag {
+      background-color: #eff6ff;
+      color: #2563eb;
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 8px;
+      border-radius: 6px;
+    }
+
+    .schedule-date {
+      font-size: 0.8rem;
+      color: #64748b;
+    }
+
+    .schedule-time {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #3b82f6;
+      margin-bottom: 6px;
+    }
+
+    .schedule-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      line-height: 1.4;
+    }
+
+    .schedule-desc {
+      font-size: 0.88rem;
+      color: #475569;
+      line-height: 1.5;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>프로젝트 일정표</h1>
+  
+  <!-- JSON 데이터가 채워질 영역 -->
+  <div id="schedule-list" class="schedule-wrapper"></div>
+
+  <script>
+    fetch('./schedule.json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('데이터를 불러오는 데 실패했습니다.');
+        }
+        return response.json();
+      })
+      .then(data => {
+        const container = document.getElementById('schedule-list');
+
+        data.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'schedule-card';
+
+          card.innerHTML = `
+            <div>
+              <div class="card-header">
+                <span class="schedule-tag">${item.tag}</span>
+                <span class="schedule-date">${item.date}</span>
+              </div>
+              <div class="schedule-time">${item.time}</div>
+              <div class="schedule-title">${item.title}</div>
+            </div>
+            <div class="schedule-desc">${item.description}</div>
+          `;
+
+          container.appendChild(card);
+        });
+      })
+      .catch(error => {
+        console.error(error);
+        document.getElementById('schedule-list').innerHTML = 
+          '<p style="color: red;">일정 데이터를 불러올 수 없습니다. 서버 환경에서 실행했는지 확인해주세요.</p>';
+      });
+  </script>
+
+</body>
+</html>
